@@ -1,6 +1,15 @@
 // Import the necessary libraries
 import axios from "axios";
 
+// Function to check if the AI service is configured
+function isConfiguredAnalysis() {
+  // Check if the necessary environment variables are set
+  const generateKey = process.env.REACT_APP_API_KEY;
+
+  // Return true if all environment variables are set, false otherwise
+  return !!generateKey;
+}
+
 // Function to call the Azure AI Vision service Image Analysis 4.0 API
 async function analyzeImage(imageUrl) {
   try {
@@ -27,4 +36,4 @@ async function analyzeImage(imageUrl) {
   }
 }
 
-export default analyzeImage;
+export { isConfiguredAnalysis, analyzeImage };

@@ -1,6 +1,9 @@
 import React, { useState } from "react";
-import analyzeImage from "./azure-image-analysis";
-import generateImage from "./azure-image-generation";
+import { analyzeImage, isConfiguredAnalysis } from "./azure-image-analysis";
+import {
+  generateImage,
+  isConfiguredGeneration,
+} from "./azure-image-generation";
 import "./App.css";
 
 function App() {
@@ -16,10 +19,8 @@ function App() {
   const handleImageGeneration = async () => {
     setIsLoading(true);
     const data = await generateImage(inputValue);
-    console.log(data);
     setResponseGenerated(data);
     setIsLoading(false);
-    console.log("Image generation triggered");
   };
 
   const handleImageAnalysis = async () => {
@@ -29,10 +30,9 @@ function App() {
       setResponse(data);
       setIsLoading(false);
     }
-    console.log("Image analysis triggered");
   };
 
-  return (
+  return isConfiguredGeneration() && isConfiguredAnalysis() ? (
     <div>
       <h1>Image Analysis and Generation</h1>
       <label>
@@ -52,11 +52,17 @@ function App() {
       {responseGenerated && (
         <div>
           <h2>Generated Image</h2>
-          <img src={responseGenerated.data[0].url} alt="Generated image" className="img-generated"/>
+          <img
+            src={responseGenerated.data[0].url}
+            alt="Generated image"
+            className="img-generated"
+          />
           <pre>{JSON.stringify(responseGenerated, null, 2)}</pre>
         </div>
       )}
     </div>
+  ) : (
+    <h1>Not configured</h1>
   );
 }
 
