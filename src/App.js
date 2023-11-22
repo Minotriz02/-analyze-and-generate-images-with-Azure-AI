@@ -1,34 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import analyzeImage from "./azure-image-analysis";
 
 function App() {
-  const [inputValue, setInputValue] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
-  const [prompt, setPrompt] = useState('');
+  const [inputValue, setInputValue] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [response, setResponse] = useState(null); // Initialize response as null
 
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
   };
 
-  const handleImageAnalysis = () => {
-    if (inputValue.startsWith('http')) {
-      setImageUrl(inputValue);
-      setPrompt('');
-    } else {
-      setPrompt(inputValue);
-      setImageUrl('');
+  const handleImageGeneration = () => {
+    if (inputValue.startsWith("http")) {
+      console.log("Image generation triggered");
     }
-    console.log('Image analysis triggered');
   };
 
-  const handleImageGeneration = () => {
-    if (inputValue.startsWith('http')) {
-      setImageUrl(inputValue);
-      setPrompt('');
-    } else {
-      setPrompt(inputValue);
-      setImageUrl('');
+  const handleImageAnalysis = async () => {
+    if (inputValue.startsWith("http")) {
+      setIsLoading(true);
+      const data = await analyzeImage(inputValue);
+      setResponse(data);
+      setIsLoading(false);
     }
-    console.log('Image generation triggered');
+    console.log("Image analysis triggered");
   };
 
   return (
@@ -41,6 +36,13 @@ function App() {
       <br />
       <button onClick={handleImageAnalysis}>Analyze Image</button>
       <button onClick={handleImageGeneration}>Generate Image</button>
+      {isLoading && <p>Loading...</p>}
+      {response && (
+        <div>
+          <h2>Response</h2>
+          <pre>{JSON.stringify(response, null, 2)}</pre>
+        </div>
+      )}
     </div>
   );
 }
