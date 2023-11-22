@@ -32,39 +32,7 @@ function App() {
     }
   };
 
-  // return isConfiguredGeneration() && isConfiguredAnalysis() ? (
-  //   <div>
-  //     <h1>Image Analysis and Generation</h1>
-  //     <label>
-  //       Image URL / Prompt:
-  //       <input type="text" value={inputValue} onChange={handleInputChange} />
-  //     </label>
-  //     <br />
-  //     <button onClick={handleImageAnalysis}>Analyze Image</button>
-  //     <button onClick={handleImageGeneration}>Generate Image</button>
-  //     {isLoading && <p>Loading...</p>}
-  //     {response && (
-  //       <div>
-  //         <h2>Response</h2>
-  //         <pre>{JSON.stringify(response, null, 2)}</pre>
-  //       </div>
-  //     )}
-  //     {responseGenerated && (
-  //       <div>
-  //         <h2>Generated Image</h2>
-  //         <img
-  //           src={responseGenerated.data[0].url}
-  //           alt="Generated image"
-  //           className="img-generated"
-  //         />
-  //         <pre>{JSON.stringify(responseGenerated, null, 2)}</pre>
-  //       </div>
-  //     )}
-  //   </div>
-  // ) : (
-  //   <h1>Not configured</h1>
-  // );
-  return (
+  return isConfiguredGeneration() && isConfiguredAnalysis() ? (
     <div>
       <h1>Image Analysis and Generation</h1>
       <label>
@@ -93,6 +61,8 @@ function App() {
         </div>
       )}
     </div>
+  ) : (
+    <h1>Not configured</h1>
   );
 }
 
