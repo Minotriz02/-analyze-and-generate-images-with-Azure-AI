@@ -1,0 +1,9 @@
+#root{
+    background-color: #1F1F1F;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    color: #FC93AD;
+}
