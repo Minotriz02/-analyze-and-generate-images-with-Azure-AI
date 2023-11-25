@@ -5,6 +5,7 @@ import {
   isConfiguredGeneration,
 } from "./azure-image-generation";
 import "./App.css";
+import { Button, Form } from "react-bootstrap";
 
 function App() {
   const [inputValue, setInputValue] = useState("");
@@ -34,14 +35,21 @@ function App() {
 
   return isConfiguredGeneration() && isConfiguredAnalysis() ? (
     <div>
-      <h1>Image Analysis and Generation</h1>
-      <label>
-        Image URL / Prompt:
-        <input type="text" value={inputValue} onChange={handleInputChange} />
-      </label>
+      <h1>VisionForge</h1>
+      <Form>
+        <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+          <Form.Label>Image URL / Prompt:</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="url or image to generate"
+            value={inputValue}
+            onChange={handleInputChange}
+          />
+        </Form.Group>
+      </Form>
       <br />
-      <button onClick={handleImageAnalysis}>Analyze Image</button>
-      <button onClick={handleImageGeneration}>Generate Image</button>
+      <Button onClick={handleImageAnalysis} className="me-2">Analyze Image</Button>
+      <Button onClick={handleImageGeneration}>Generate Image</Button>
       {isLoading && <p>Loading...</p>}
       {response && (
         <div>
@@ -57,7 +65,9 @@ function App() {
             alt="Generated image"
             className="img-generated"
           />
-          <pre>{JSON.stringify(responseGenerated, null, 2)}</pre>
+          <pre style={{ maxWidth: "500px" }}>
+            {JSON.stringify(responseGenerated, null, 2)}
+          </pre>
         </div>
       )}
     </div>
