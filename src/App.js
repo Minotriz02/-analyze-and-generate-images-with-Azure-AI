@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { analyzeImage, isConfiguredAnalysis } from "./azure-image-analysis";
 import {
   generateImage,
@@ -6,24 +6,29 @@ import {
 } from "./azure-image-generation";
 import "./App.css";
 import { Button, Form, Modal, Spinner } from "react-bootstrap";
+import { IconAlertCircle } from "@tabler/icons-react";
 
 function App() {
   const [inputValue, setInputValue] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [response, setResponse] = useState(null); // Initialize response as null
   const [responseGenerated, setResponseGenerated] = useState(null); // Initialize response as null
   const [analysisValidation, setAnalysisValidation] = useState(true);
   const [showAnalysis, setShowAnalysis] = useState(false);
+  const [showGenerated, setShowGenerated] = useState(false);
+  const [modalError, setModalError] = useState(false);
 
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
   };
 
   const handleImageGeneration = async () => {
-    setIsLoading(true);
-    const data = await generateImage(inputValue);
+    setShowGenerated(true);
+    const data = await generateImage(inputValue).catch((error) => {
+      setModalError(true);
+    });
+    setResponse(null);
     setResponseGenerated(data);
-    setIsLoading(false);
+    setShowGenerated(false);
   };
 
   const handleImageAnalysis = async () => {
@@ -32,18 +37,37 @@ function App() {
     } else if (inputValue.startsWith("http")) {
       setAnalysisValidation(true);
       setShowAnalysis(true);
-      const data = await analyzeImage(inputValue);
+      const data = await analyzeImage(inputValue).catch((error) => {
+        setModalError(true);
+      });
+      if (data) {
+        data.imgUrl = inputValue;
+      }
+      setResponseGenerated(null);
       setResponse(data);
       setShowAnalysis(false);
     }
   };
-
+  
   return isConfiguredGeneration() && isConfiguredAnalysis() ? (
     <div>
+      <Modal show={modalError} centered onHide={() => setModalError(false)}>
+        <Modal.Body className="d-flex align-items-center bg-danger text-bg-danger rounded-2 ">
+          <IconAlertCircle size={60} className="me-2" />
+          An error occurred while processing your request, please try again or
+          try another url or image
+        </Modal.Body>
+      </Modal>
       <Modal show={showAnalysis} backdrop="static" keyboard={false} centered>
         <Modal.Body className="d-flex align-items-center ">
           <Spinner animation="border" variant="primary" className="me-2" />
-          Your image are being analyzed, please wait a moment...
+          Your image is being analyzed, please wait a moment...
+        </Modal.Body>
+      </Modal>
+      <Modal show={showGenerated} backdrop="static" keyboard={false} centered>
+        <Modal.Body className="d-flex align-items-center ">
+          <Spinner animation="border" variant="primary" className="me-2" />
+          Your image is being generated, please wait a moment...
         </Modal.Body>
       </Modal>
       <h1>VisionForge</h1>
@@ -64,26 +88,22 @@ function App() {
             </label>
           )}
         </Form.Group>
-        <Button
-          onClick={handleImageAnalysis}
-          accordion-collapse
-          className="me-2"
-        >
+        <Button onClick={handleImageAnalysis} className="me-2">
           Analyze Image
         </Button>
-        <button class="glow-on-hover" onClick={handleImageGeneration}>
+        <Button className="glow-on-hover" onClick={handleImageGeneration}>
           Generate Image
-        </button>
+        </Button>
       </Form>
       <br />
-
-      {isLoading && <p>Loading...</p>}
       {response && (
         <div>
           <h2>Response</h2>
-          <pre>{JSON.stringify(response, null, 2)}</pre>
+          <p>{response.captionResult.text}</p>
+          <img src={response.imgUrl} alt="analyzed" className="img-generated" />
         </div>
       )}
+
       {responseGenerated && (
         <div>
           <h2>Generated Image</h2>
@@ -92,9 +112,6 @@ function App() {
             alt="Generated"
             className="img-generated"
           />
-          <pre style={{ maxWidth: "500px" }}>
-            {JSON.stringify(responseGenerated, null, 2)}
-          </pre>
         </div>
       )}
     </div>
